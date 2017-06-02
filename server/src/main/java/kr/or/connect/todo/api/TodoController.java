@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpStatus;
 
-import kr.or.connect.domain.Todo;
+import kr.or.connect.todo.domain.Todo;
 import kr.or.connect.todo.service.TodoService;
 
 @RestController
@@ -26,19 +26,26 @@ public class TodoController {
 	@Autowired
 	public TodoController(TodoService service) {
 		this.service = service;
-	}
 
-	/// api/todos의 경로에 REST 스타일로 API를 정의한다.
-	// @RestController, @GetMapping, @PostMapping, @PutMapping, @DeleteMapping
-	/// 애너테이션을 활용한다.
+	}
 
 	@GetMapping
 	Collection<Todo> readList() {
 		return service.findAll();
 	}
 
+	@GetMapping("active")
+	Collection<Todo> readByActiveList() {
+		return service.findByCompleted(false);
+	}
+
+	@GetMapping("/completed")
+	Collection<Todo> readByCompletedList() {
+		return service.findByCompleted(true);
+	}
+
 	@GetMapping("/{id}")
-	Todo read(@PathVariable Integer id) {
+	Todo readById(@PathVariable Integer id) {
 		return service.findById(id);
 	}
 

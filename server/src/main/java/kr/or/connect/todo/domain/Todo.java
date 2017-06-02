@@ -1,4 +1,4 @@
-package kr.or.connect.domain;
+package kr.or.connect.todo.domain;
 
 import java.sql.Date;
 
@@ -8,11 +8,7 @@ public class Todo {
 	private boolean completed;
 	private Date date;
 
-	public Todo()
-	{}
-	
-	public Todo(String todo) {
-		this.todo = todo;
+	public Todo() {
 	}
 
 	public Todo(Integer id, String todo, boolean completed, Date date) {
@@ -53,5 +49,4 @@ public class Todo {
 	public void setDate(Date date) {
 		this.date = date;
 	}
-
 }

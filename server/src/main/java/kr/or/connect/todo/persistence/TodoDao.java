@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -15,7 +14,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
-import kr.or.connect.domain.Todo;
+import kr.or.connect.todo.domain.Todo;
 
 @Repository
 public class TodoDao {
@@ -30,14 +29,14 @@ public class TodoDao {
 				.usingColumns("todo");
 	}
 
-	// 패키지는 kr.or.connect.todo.persistence로 선언한다.
-	// Spring JDBC의 SimpleJdbcInsert, NamedParameterJdbcTemplate을 이용해서 구현한다.
-	// CRUD 동작을 실행하는 역할에만 충실하도록 구현한다.
-	// SQL구문은 TodoSqls 클래스에 상수로 선언한다.
-
 	public List<Todo> selectAll() {
 		Map<String, Object> params = Collections.emptyMap();
 		return jdbc.query(TodoSqls.SELECT_ALL, params, rowMapper);
+	}
+
+	public List<Todo> selectByCompleted(boolean completed) {
+		Map<String, Object> params = Collections.singletonMap("completed", completed);
+		return jdbc.query(TodoSqls.SELECT_BY_COMPLETED, params, rowMapper);
 	}
 
 	public Todo selectById(Integer id) {
@@ -48,11 +47,9 @@ public class TodoDao {
 	public Integer insert(Todo todo) {
 		SqlParameterSource params = new BeanPropertySqlParameterSource(todo);
 		return insertAction.executeAndReturnKey(params).intValue();
-
 	}
 
 	public Integer update(Todo todo) {
-
 		SqlParameterSource params = new BeanPropertySqlParameterSource(todo);
 		return jdbc.update(TodoSqls.UPDATE, params);
 	}
@@ -61,5 +58,4 @@ public class TodoDao {
 		Map<String, ?> params = Collections.singletonMap("id", id);
 		return jdbc.update(TodoSqls.DELETE_BY_ID, params);
 	}
-
 }
