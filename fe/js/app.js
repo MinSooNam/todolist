@@ -12,8 +12,6 @@
 
     $(function() {
         setTodoList(TYPE_ALL);
-
-
     });
 
 
@@ -21,35 +19,7 @@
 
 
 
-    $('.new-todo').on('keydown', function(event) {
-        if (event.which == 13) {
-            event.preventDefault();
 
-            var todo = this.value;
-            //새로 추가
-
-            if (todo == '') {
-                alert('Please fill out the todo');
-									return;
-            }
-
-						            //alert('nonononono');
-
-            var todoData = JSON.stringify({
-                'todo': todo
-            });
-            addTodo(todoData);
-
-        }
-    });
-
-
-    $('.main').on('click', '.toggle', function() {
-        //할 일 완료/미완료를 왔다갔다거리게
-        //디비 수정
-
-        alert("클릭했어요");
-    });
 
 
     $('.main').on('click', '.destroy', function() {
@@ -61,14 +31,53 @@
     });
 
     $('.footer').on('click', '.clear-completed', function() {
-        //할 일 삭제
+        //완료된 할 일 삭제
         //디비에 삭제
-
 
         alert("클릭했어요");
     });
 
 
+
+    $('.main').on('click', '.toggle', function() {
+        //할 일 완료/미완료를 왔다갔다거리게
+        //디비 수정
+
+        var id = this.value;
+        var todo = $(this).parents('view').find('label').html;
+        var completed = this.checked; //바뀔 값
+
+        var todoData = {
+            'id': id,
+            'completed': completed
+        };
+//updateTodo(todoData);
+//$(this).parents('li').addClass('completed');
+        alert(todo);
+    });
+
+
+
+    $('.new-todo').on('keydown', function(event) {
+        if (event.which == 13) {
+            event.preventDefault();
+
+            var todo = this.value;
+            this.value = '';
+
+            if (todo == '') {
+                alert('Please fill out the todo');
+                return;
+            }
+
+            var todoData = {
+                'todo': todo,
+                'completed': !IS_COMPLETED
+            };
+
+            addTodo(todoData);
+        }
+    });
 
 
     $('.filters li').on('click', function(event) {
@@ -79,6 +88,29 @@
 
 
 
+    function updateTodo(todoData) {
+        $.ajax({
+            method: 'PUT',
+            url: '/api/todos/' + todoData.id,
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(todoData),
+            success: function(data) {
+                //alert('completed add todo');
+
+//li class 변경
+$(this).parents('li').addClass('completed');
+
+            },
+            error: function() {
+
+              //체크 원래대로..... 그냥 리스트 다시 부르까...?
+                alert('failed add todo');
+            }
+
+        });
+    }
+
 
     function addTodo(todoData) {
         $.ajax({
@@ -86,12 +118,17 @@
             url: '/api/todos',
             contentType: 'application/json',
             dataType: 'json',
-            data: todoData,
+            data: JSON.stringify(todoData),
             success: function(data) {
-                alert('성공');
+                //alert('completed add todo');
+                todoList.prepend(getLiString(todoData));
+
+                var count = todoCount.html().split(' ');
+                setTodoCount(++count[0])
+
             },
             error: function() {
-                alert('실패');
+                alert('failed add todo');
             }
 
         });
@@ -111,13 +148,13 @@
                 todoList.empty();
                 for (var i in data) {
                     if (type == TYPE_ALL) {
-                        str += appendStr();
+                        str += getLiString(data[i]);
                         count++;
                     } else if (type == TYPE_ACTIVE && data[i].completed != IS_COMPLETED) {
-                        str += appendStr(str);
+                        str += getLiString(data[i]);
                         count++;
                     } else if (type == TYPE_COMPLETED && data[i].completed == IS_COMPLETED) {
-                        str += appendStr(str);
+                        str += getLiString(data[i]);
                         count++;
                     }
                 }
@@ -125,14 +162,16 @@
 
                 setTodoCount(count);
 
-                function appendStr() {
-                    return `<li ` + (data[i].completed == IS_COMPLETED ? `class="completed"` : ``) + `><div class="view"><input class="toggle" type="checkbox"` + (data[i].completed == IS_COMPLETED ? `checked` : ``) + ` ><label>` + data[i].todo + `</label><button class="destroy"></button></div></li>`
-                }
+
             },
             error: function() {
 
             }
         });
+    }
+
+    function getLiString(data) {
+        return `<li ` + (data.completed == IS_COMPLETED ? `class="completed"` : ``) + `><div class="view"><input class="toggle" type="checkbox"` + (data.completed == IS_COMPLETED ? ` checked` : ``)+` value="` +data.id+ `"><label>` + data.todo + `</label><button class="destroy"></button></div></li>`
     }
 
     function setTodoCount(count) {
