@@ -10,4 +10,5 @@ public class TodoSqls {
 			+ "completed = :completed\n"
 			+ "WHERE id = :id";
 	public static final String DELETE_BY_ID = "DELETE FROM TODO WHERE id= :id";
+	public static final String DELETE_BY_COMPLETED = "DELETE FROM TODO WHERE completed= true";
 }
