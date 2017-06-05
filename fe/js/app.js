@@ -11,7 +11,7 @@
     var $todoCount = $('.todo-count');
 
     /*
-        register events
+        set events
     */
     $(function() {
         setTodoList(TYPE_ALL);
@@ -63,6 +63,8 @@
     });
 
     $('.filters li').on('click', function(event) {
+
+
         setTodoList(event.target.id);
         event.stopPropagation();
     });
@@ -71,7 +73,6 @@
     /*
         Jquery ajax functions
     */
-
     function setTodoList(type) {
         $.ajax({
             method: 'GET',
@@ -86,16 +87,15 @@
                 for (var i in data) {
                     if (type == TYPE_ALL) {
                         str += getHtmlLi(data[i]);
-                        if (data[i].completed != IS_COMPLETED) {
-                            count++
-                        };
                     } else if (type == TYPE_ACTIVE && data[i].completed != IS_COMPLETED) {
                         str += getHtmlLi(data[i]);
-                        count++;
                     } else if (type == TYPE_COMPLETED && data[i].completed == IS_COMPLETED) {
                         str += getHtmlLi(data[i]);
-                        //count++;
                     }
+
+                    if (data[i].completed != IS_COMPLETED) {
+                        count++
+                    };
                 }
                 $todoList.append(str);
 
@@ -162,10 +162,13 @@
             contentType: 'application/json',
             dataType: 'json',
             success: function(data) {
+                var isCompleted = $todoList.children('li').eq(liIndex).hasClass('completed')
                 $todoList.children('li').eq(liIndex).remove()
 
-                var count = $todoCount.html().split(' ');
-                setTodoCount(--count[0])
+                if (!isCompleted) {
+                    var count = $todoCount.html().split(' ');
+                    setTodoCount(--count[0])
+                }
             },
             error: function() {
                 alert('failed delete todo');
@@ -183,9 +186,6 @@
                 var completedList = $todoList.children('li.completed')
 
                 completedList.remove();
-
-                var count = $todoCount.html().split(' ');
-                setTodoCount(count[0] - completedList.length)
             },
             error: function() {
                 alert('failed clear-completed');
