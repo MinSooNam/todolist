@@ -86,13 +86,15 @@
                 for (var i in data) {
                     if (type == TYPE_ALL) {
                         str += getHtmlLi(data[i]);
-                        count++;
+                        if (data[i].completed != IS_COMPLETED) {
+                            count++
+                        };
                     } else if (type == TYPE_ACTIVE && data[i].completed != IS_COMPLETED) {
                         str += getHtmlLi(data[i]);
                         count++;
                     } else if (type == TYPE_COMPLETED && data[i].completed == IS_COMPLETED) {
                         str += getHtmlLi(data[i]);
-                        count++;
+                        //count++;
                     }
                 }
                 $todoList.append(str);
@@ -132,10 +134,14 @@
             dataType: 'json',
             data: JSON.stringify(todoData),
             success: function(data) {
+                var count = $todoCount.html().split(' ');
+
                 if (todoData.completed) {
                     $toggle.parents('li').addClass('completed');
+                    setTodoCount(--count[0])
                 } else if (!todoData.completed) {
                     $toggle.parents('li').removeClass('completed');
+                    setTodoCount(++count[0])
                 }
             },
             error: function() {
@@ -202,6 +208,7 @@
     }
 
     function setTodoCount(count) {
+        count = (count < 0 ? 0 : count);
         $todoCount.html(count + ' item left');
     }
 
