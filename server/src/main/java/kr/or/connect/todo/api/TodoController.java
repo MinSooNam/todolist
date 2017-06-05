@@ -26,15 +26,31 @@ public class TodoController {
 	@Autowired
 	public TodoController(TodoService service) {
 		this.service = service;
-
 	}
+	
+	/*
+	 * <api list>
+	 * api url : /api/todos/
+	 * 
+	 * GET		/			get todos list
+	 * GET		/active		get active todos list
+	 * GET		/completed	get completed todos list
+	 * GET		/{id}		get the todo from id
+	 * POST		/			post a todo
+	 * PUT		/{id}		put the todo from id
+	 * DELETE	/completed	delete completed todos list
+	 * DELETE	/{id}		delete the todo from id
+	 * 
+	 * GET		/hello		Welcome~
+	 * 
+	 * */
 
 	@GetMapping
 	Collection<Todo> readList() {
 		return service.findAll();
 	}
 
-	@GetMapping("active")
+	@GetMapping("/active")
 	Collection<Todo> readByActiveList() {
 		return service.findByCompleted(false);
 	}
@@ -78,6 +94,6 @@ public class TodoController {
 
 	@GetMapping("/hello")
 	String hello() {
-		return "Hello World";
+		return "Hello, Ted's Todo World~";
 	}
 }
