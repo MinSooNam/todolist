@@ -63,8 +63,6 @@
     });
 
     $('.filters li').on('click', function(event) {
-
-
         setTodoList(event.target.id);
         event.stopPropagation();
     });
